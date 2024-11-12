@@ -1,0 +1,14 @@
+<x-data>
+  <display-name>ImageShop</display-name>
+  <form>
+    <input name="callback_url" type="TextLine">
+      <label i18n="iimage.x-data.callback_url">Callback URL</label>
+      <occurrences minimum="0" maximum="1" />
+    </input>
+
+    <input name="document_id" type="TextLine">
+      <label i18n="iimage.x-data.document_id">ImageShop ID</label>
+      <occurrences minimum="0" maximum="1" />
+    </input>
+  </form>
+</x-data>

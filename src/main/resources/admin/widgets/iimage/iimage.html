@@ -1,0 +1,31 @@
+<widget
+  class="iimage-wrapper"
+  th:data-import-image-service-url="${importImageServiceUrl}"
+  th:data-sync-image-info-service-url="${syncImageInfoServiceUrl}"
+  th:data-image-shop-url="${imageShopURL}"
+  th:data-strings="${stringsJson}"
+>
+  <link rel="stylesheet" th:href="${portal.assetUrl({'_path=/css/styles.css'})}" />
+
+  <th:block th:if="${!#lists.isEmpty(inputsAllowedToUploadImage)}">
+    <details open style="width: 100%; margin-bottom: 8px;">
+      <summary>Select an input to set the image</summary>
+      <ul style="margin-top: 8px;">
+        <th:block th:each="input : ${inputsAllowedToUploadImage}">
+          <li>
+            <input type="radio" th:id="${input.name}" name="inputName" th:value="${input.name}" />
+            <label th:for="${input.name}" th:text="${input.label}">Input label</label>
+          </li>
+        </th:block>
+      </ul>
+    </details> 
+  </th:block>
+
+  <div id="imageshop-message" class="imageshop-message-wrapper">
+    <p>Successfull/Error message</p>
+  </div>
+  <button type="button" id="imageshop-button" th:text="${strings.openImageShop}">Open ImageShop</button>
+  <button th:if="${showSyncButton}" type="button" id="imageshop-sync-info-button" th:text="${strings.syncInfo}">Sync Info</button>
+
+  <script th:src="${portal.assetUrl({'_path=/js/main.js'})}"></script>
+</widget>

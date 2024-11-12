@@ -1,0 +1,32 @@
+widget.iimage-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 8px;
+}
+
+widget.iimage-wrapper .imageshop-message-wrapper {
+  align-self: stretch;
+  color: #fff;
+  display: none;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+widget.iimage-wrapper .imageshop-message-wrapper[data-status="success"] {
+  display: flex;
+  background-color: #4CAF50;
+}
+
+widget.iimage-wrapper .imageshop-message-wrapper[data-status="error"] {
+  display: flex;
+  background-color: #f44336;
+}
+
+widget.iimage-wrapper button {
+  width: 100%;
+  height: 48px;
+  margin-bottom: 8px;
+  border: none;
+  cursor: pointer;
+}

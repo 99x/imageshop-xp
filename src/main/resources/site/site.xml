@@ -1,0 +1,76 @@
+<!-- Delete this file if you are building a web app -->
+<site>
+  <x-data name="iimage" allowContentTypes="media:image" />
+
+  <form>
+    <input name="iimage_imported_resources_folder" type="ContentSelector">
+      <label i18n="iimage.site.iimage_imported_resources_folder">Imported resources folder</label>
+      <occurrences minimum="1" maximum="1" />
+      <config>
+        <allowPath>${site}/*</allowPath>
+      </config>
+    </input>
+
+    <field-set>
+      <label i18n="iimage.site.settings">ImageShop Settings</label>
+      <items>
+        <input name="iimage_host" type="TextLine">
+          <label i18n="iimage.site.iimage_host">Host</label>
+          <occurrences minimum="1" maximum="1" />
+        </input>
+
+        <input name="iimage_token" type="TextLine">
+          <label i18n="iimage.site.iimage_token">Token</label>
+          <occurrences minimum="1" maximum="1" />
+        </input>
+
+        <input name="iimage_private_key" type="TextLine">
+          <label i18n="iimage.site.iimage_private_key">Private Key</label>
+          <occurrences minimum="1" maximum="1" />
+        </input>
+
+        <input name="iimage_interface_name" type="TextLine">
+          <label i18n="iimage.site.iimage_interface_name">Interface Name</label>
+          <help-text i18n="iimage.site.iimage_interface_name.help-text">Standard interface used when searching images.</help-text>
+          <occurrences minimum="0" maximum="1" />
+        </input>
+
+        <input name="iimage_document_prefix" type="TextLine">
+          <label i18n="iimage.site.iimage_document_prefix">Document Prefix</label>
+          <help-text i18n="iimage.site.iimage_document_prefix.help-text">Standard document code prefix used when uploading images.</help-text>
+          <occurrences minimum="0" maximum="1" />
+        </input>
+
+        <input name="iimage_sizes" type="TextLine">
+          <label i18n="iimage.site.iimage_sizes">Sizes</label>
+          <help-text i18n="iimage.site.iimage_sizes.help-text">Format: name;size. Example: Stor 640x480;640x480</help-text>
+          <occurrences minimum="0" maximum="0" />
+          <default>Normal 320x240;320x240</default>
+        </input>
+
+        <field-set>
+          <label i18n="iimage.site.language">Language Settings</label>
+          <items>
+            <input name="iimage_language" type="TextLine">
+              <label i18n="iimage.site.iimage_language">Language</label>
+              <help-text i18n="iimage.site.iimage_language.help-text">Standard language to ge image information (alternative text and caption) from. Example: "no", "en", "nn" etc.</help-text>
+              <occurrences minimum="0" maximum="1" />
+            </input>
+
+            <input name="iimage_language_alt_label" type="TextLine">
+              <label i18n="iimage.site.iimage_language_alt_label">Alt-text name</label>
+              <help-text i18n="iimage.site.iimage_language_alt_label.help-text">Alternative text name to be searched in the ImagShop response</help-text>
+              <occurrences minimum="0" maximum="1" />
+            </input>
+
+            <input name="iimage_language_caption" type="TextLine">
+              <label i18n="iimage.site.iimage_language_caption">Image caption name</label>
+              <help-text i18n="iimage.site.iimage_language_caption.help-text">Image caption name to be searched in the ImagShop response</help-text>
+              <occurrences minimum="0" maximum="1" />
+            </input>
+          </items>
+        </field-set>
+      </items>
+    </field-set>
+  </form>
+</site>
