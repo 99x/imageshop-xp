@@ -1,4 +1,4 @@
-# ImageShop Integration Widget
+# ImageShop
 
 This repository contains an application designed to facilitate the integration of Enonic XP-based sites with the ImageShop platform. The application includes features for efficiently importing, editing, and synchronizing images between the site and the ImageShop media library.
 
@@ -57,6 +57,6 @@ cd imageshop-xp
 | 1.0.x  | 7.9.0       |
 
 ## License and credits
-The application is licensed under the [Enonic License](https://github.com/99x/imageshop-xp/LICENSE.txt)
+The application is licensed under the [Enonic License](https://github.com/99x/imageshop-xp/blob/main/LICENSE.txt)
 
 Made by [99x](https://99x.io)
