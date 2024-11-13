@@ -1,5 +1,6 @@
 plugins {
     id 'com.enonic.xp.app' version '3.4.0'
+    id 'maven-publish'
 }
 
 app {
@@ -38,4 +39,30 @@ repositories {
     mavenLocal()
     mavenCentral()
     xp.enonicRepo()
+        maven {
+        url = "https://maven.pkg.github.com/99x/imageshop-xp"
+        name = "99x"
+    }
+
+}
+
+publishing {
+    publications {
+        gpr(MavenPublication) {
+            groupId = "${group}"
+            artifactId = "${projectName}"
+            version = "${version}"		
+            from components.java
+        }
+    }
+	repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/99x/imageshop-xp"
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME") // fill properly the value at gradle.properties
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN") // fill properly the value at gradle.properties
+            }
+        }
+    }
 }
