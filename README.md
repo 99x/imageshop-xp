@@ -47,6 +47,13 @@ cd imageshop-xp
      - **Language** (optional, default language for image searches)
 
    These inputs ensure the proper configuration and functionality of the ImageShop integration in your site.
+3. **Alternative Token and Private Key Configuration**:  
+   The **Token** and **Private Key** required for HTTP requests to the ImageShop endpoint can also be provided through the configuration file `io.99x.imageshop.cfg`. Use the following variables in the file:
+
+   - `imageshopToken`: Specify the ImageShop token.
+   - `imageshopPrivateKey`: Specify the ImageShop private key.
+
+   This approach offers a centralized and secure way to manage these credentials.
 
 
 
