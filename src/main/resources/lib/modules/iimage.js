@@ -99,8 +99,8 @@ function getTemporaryToken (appConfig) {
       url: 'https://webservices.imageshop.no/V4.asmx/GetTemporaryToken',
       method: 'GET',
       queryParams: {
-        privateKey: appConfig.iimage_private_key,
-        token: appConfig.iimage_token
+        privateKey: app.config.imageshopPrivateKey || appConfig.iimage_private_key,
+        token: app.config.imageshopToken || appConfig.iimage_token
       }
     })
 
