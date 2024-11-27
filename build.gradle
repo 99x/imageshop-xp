@@ -26,7 +26,6 @@ dependencies {
     include "com.enonic.lib:lib-thymeleaf:2.1.0"
     include 'com.enonic.lib:lib-http-client:3.2.2'
     include "com.enonic.lib:lib-cron:1.1.2"
-
     include "org.json:json:20200518"
 }
 
@@ -38,4 +37,32 @@ repositories {
     mavenLocal()
     mavenCentral()
     xp.enonicRepo()
+    maven {
+        url = uri("https://maven.pkg.github.com/99x/imageshop-xp")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME") // fill properly the value at gradle.properties
+            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN") // fill properly the value at gradle.properties
+        }
+    }
+}
+
+publishing {
+    publications {
+        gpr(MavenPublication) {
+            from components.java
+            groupId = project.findProperty("group") // fill properly the value at gradle.properties
+            artifactId = project.findProperty("projectName") // fill properly the value at gradle.properties
+            version = project.findProperty("version") // fill properly the value at gradle.properties
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/99x/imageshop-xp")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME") // fill properly the value at gradle.properties
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN") // fill properly the value at gradle.properties
+            }
+        }
+    }
 }
