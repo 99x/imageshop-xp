@@ -1,4 +1,5 @@
 plugins {
+    id 'maven-publish'
     id 'com.enonic.xp.app' version '3.4.0'
 }
 
@@ -64,5 +65,12 @@ publishing {
                 password = project.findProperty("gpr.key") ?: System.getenv("TOKEN") // fill properly the value at gradle.properties
             }
         }
+    }
+}
+
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
     }
 }
