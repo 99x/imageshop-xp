@@ -15,6 +15,7 @@ exports.post = function (request) {
     /** @type ImageInfo */
     const imageData = data.imageData || {}
     const propertyName = data.propertyName
+    const propertyPath = data.propertyPath
 
     if (!params.contentId) {
       return {
@@ -78,7 +79,7 @@ exports.post = function (request) {
 
         const currentContent = libs.content.get({ key: params.contentId })
 
-        if (currentContent && propertyName) {
+        if (currentContent && propertyName && !propertyPath) {
           const updatedContent = libs.content.modify({
             key: params.contentId,
             editor: function (c) {
@@ -89,6 +90,31 @@ exports.post = function (request) {
           })
 
           image.wasContentUpdated = !!updatedContent
+        }
+
+        if (currentContent && propertyName && propertyPath) {
+          const connection = libs.iimage.getConnection()
+
+          if (connection) {
+            connection.draft.modify({
+              key: params.contentId,
+              editor: function (n) {
+                n.components = n.components.map(component => {
+                  if (component.type !== 'part' || component.path !== propertyPath) return component
+
+                  const descriptor = String(component.part.descriptor).split(':')
+                  const appName = descriptor[0].replace(/\./g, "-");
+                  const partName = descriptor[1]
+
+                  component.part.config[appName][partName][propertyName] = image._id
+
+                  return component
+                })
+
+                return n
+              }
+            })
+          }
         }
 
         image.editURL = generateEditURL({ request, imageId: image._id })

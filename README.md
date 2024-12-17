@@ -62,6 +62,7 @@ cd imageshop-xp
 | Version | XP version   |
 | ------- | ------------ |
 | 1.0.x  | 7.9.0       |
+| 2.0.x  | 7.11.0      |
 
 ## License and credits
 The application is licensed under the [Enonic License](https://github.com/99x/imageshop-xp/blob/main/LICENSE.txt)

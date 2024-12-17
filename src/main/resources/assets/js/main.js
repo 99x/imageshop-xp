@@ -5,11 +5,15 @@ function main() {
 
   function setMessageEventListener (event) {
     const eventData = event.data.split(';')
-    const propertyNameRadioElement = document.querySelector(`input[name="inputName"]:checked`) || {}
+    const selectedPropertyRadioElement = document.querySelector(`input[name="inputName"]:checked`) || {}
 
     changeUploadButtonState('loading')
 
-    storeImageInEnonic({ imageData: JSON.parse(eventData[0]), propertyName: propertyNameRadioElement.value })
+    storeImageInEnonic({
+      imageData: JSON.parse(eventData[0]),
+      propertyName: selectedPropertyRadioElement.value,
+      propertyPath: selectedPropertyRadioElement.getAttribute('data-property-path')
+    })
   }
 
   const imageshop = {
@@ -61,10 +65,12 @@ function syncImageInfo(e) {
  * @param {Object} params
  * @param {Object} params.imageData image object returned
  * @param {String} params.propertyName object property name to store the image in Enonic
+ * @param {String?} params.propertyPath object property path if the input selected is a part
  */
 function storeImageInEnonic(params) {
   const imageData = params.imageData
   const propertyName = params.propertyName
+  const propertyPath = params.propertyPath
 
   const importImageServiceUrl = document.querySelector('[data-import-image-service-url]').getAttribute('data-import-image-service-url');
   const openImageShopButton = document.getElementById('imageshop-button');
@@ -73,7 +79,7 @@ function storeImageInEnonic(params) {
   fetch(importImageServiceUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ imageData, propertyName })
+    body: JSON.stringify({ imageData, propertyName, propertyPath })
   })
     .then(response => response.json())
     .then(data => {

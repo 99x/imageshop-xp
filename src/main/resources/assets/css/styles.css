@@ -30,3 +30,7 @@ widget.iimage-wrapper button {
   border: none;
   cursor: pointer;
 }
+
+widget.iimage-wrapper details ul li {
+  margin-bottom: 8px;
+}

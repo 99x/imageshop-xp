@@ -3,6 +3,7 @@
 const libs = {
   content: require('/lib/xp/content'),
   context: require('/lib/xp/context'),
+  schema: require('/lib/xp/schema'),
   node: require('/lib/xp/node'),
   io: require('/lib/xp/io'),
   i18n: require('/lib/xp/i18n'),
@@ -12,6 +13,7 @@ const libs = {
 }
 
 module.exports = {
+  getConnection,
   getImageShopURL,
   getInputsAllowedToUploadImage,
   getSite,
@@ -65,13 +67,48 @@ function getInputsAllowedToUploadImage(contentId) {
 
   const currentContent = libs.content.get({ key: contentId })
   const currentContentType = libs.content.getType(currentContent.type)
+  
+  const connection = getConnection()
+
+  let partsWithImageSelector = []
+
+  if (connection) {
+    const n = connection.draft.get(contentId)
+    const parts = n.components.filter(c => c.type === 'part')
+
+    let partIndex = 0
+
+    parts.forEach(p => {
+      const descriptor = p.part.descriptor
+
+      const part = libs.schema.getComponent({ key: descriptor, type: 'PART' })
+      
+      const form = explodeFieldSets(part.form)
+
+      form.filter(item => item.formItemType === 'Input' && item.inputType === 'ImageSelector').forEach(item => {
+        partIndex++
+
+        let label = `${item.label} (${part.displayName} PART) (${partIndex})`
+
+        partsWithImageSelector.push({
+          name: item.name,
+          label,
+          path: p.path,
+          type: 'PART'
+        })
+      })
+    })
+  }
+
   //Make fieldsets flat
-  let form = explodeFieldSets(currentContentType.form)
+  const form = explodeFieldSets(currentContentType.form)
 
   return form.filter(item => item.formItemType === 'Input' && item.inputType === 'ImageSelector').map(item => ({
     name: item.name,
-    label: item.label
-  }))
+    label: item.label,
+    path: '',
+    type: 'CONTENT-TYPE'
+  })).concat(partsWithImageSelector)
 }
 
 /**
@@ -220,6 +257,10 @@ function translate (key, values = []) {
   return libs.i18n.localize({ key: key, locale: 'no', values })
 }
 
+/**
+ * Gets the connection from the current context repository for draft and master branches. 
+ * @returns {{ draft: Object, master: Object }}
+ */
 function getConnection () {
   const context = libs.context.get()
 

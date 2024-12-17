@@ -12,9 +12,9 @@
       <summary>Select an input to set the image</summary>
       <ul style="margin-top: 8px;">
         <th:block th:each="input : ${inputsAllowedToUploadImage}">
-          <li>
-            <input type="radio" th:id="${input.name}" name="inputName" th:value="${input.name}" />
-            <label th:for="${input.name}" th:text="${input.label}">Input label</label>
+          <li th:with="id=|${input.name}_${input.path}|">
+            <input type="radio" th:id="${id}" name="inputName" th:value="${input.name}" th:data-type="${input.type}" th:data-property-path="${input.path}" />
+            <label th:for="${id}" th:text="${input.label}">Input label</label>
           </li>
         </th:block>
       </ul>
