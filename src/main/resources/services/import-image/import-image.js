@@ -106,7 +106,15 @@ exports.post = function (request) {
                   const appName = descriptor[0].replace(/\./g, "-");
                   const partName = descriptor[1]
 
-                  component.part.config[appName][partName][propertyName] = image._id
+                  if (!component.part.config) {
+                    component.part.config = {}
+                    component.part.config[appName] = {}
+                    component.part.config[appName][partName] = {
+                      [propertyName]: image._id
+                    }
+                  } else {
+                    component.part.config[appName][partName][propertyName] = image._id
+                  }
 
                   return component
                 })
@@ -138,9 +146,10 @@ exports.post = function (request) {
     }
 
   } catch (e) {
+    log.info(`Error while importing image: ${e}`)
     return {
       body: {
-        message: `Error: ${e}`
+        message: libs.iimage.translate('iimage.service.import-image.image_import_failed')
       },
       contentType: 'application/json'
     }
