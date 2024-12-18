@@ -74,9 +74,9 @@ function getInputsAllowedToUploadImage(contentId) {
 
   if (connection) {
     const n = connection.draft.get(contentId)
-    const parts = n.components.filter(c => c.type === 'part')
+    const parts = n.components ? n.components.filter(c => c.type === 'part') : []
 
-    let partIndex = 0
+    const processedParts = {}
 
     parts.forEach(p => {
       const descriptor = p.part.descriptor
@@ -85,10 +85,15 @@ function getInputsAllowedToUploadImage(contentId) {
       
       const form = explodeFieldSets(part.form)
 
-      form.filter(item => item.formItemType === 'Input' && item.inputType === 'ImageSelector').forEach(item => {
-        partIndex++
+      const filteredInputs = form.filter(item => item.formItemType === 'Input' && item.inputType === 'ImageSelector')
+      
+      if (processedParts[part.displayName]) processedParts[part.displayName]++
+      else processedParts[part.displayName] = 1
 
-        let label = `${item.label} (${part.displayName} PART) (${partIndex})`
+      filteredInputs.forEach(item => {
+        let label = `${item.label} (${part.displayName} PART)`
+
+        if (processedParts[part.displayName] > 1) label += ` (${processedParts[part.displayName]})`
 
         partsWithImageSelector.push({
           name: item.name,
