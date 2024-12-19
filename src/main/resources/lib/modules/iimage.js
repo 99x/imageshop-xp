@@ -74,7 +74,7 @@ function getInputsAllowedToUploadImage(contentId) {
 
   if (connection) {
     const n = connection.draft.get(contentId)
-    const parts = n.components ? n.components.filter(c => c.type === 'part') : []
+    const parts = n.components ? libs.objects.forceArray(n.components).filter(c => c.type === 'part') : []
 
     const processedParts = {}
 
