@@ -9,8 +9,6 @@ const libs = {
 exports.get = function (req) {
   const contentId = req.params.contentId
   const sitesWithIImageAppInstalled = libs.iimage.getSitesWithIImageAppInstalled()
-  
-  const content = libs.content.get({ key: req.params.contentId })
 
   if (!sitesWithIImageAppInstalled.length) {
     return {
@@ -25,6 +23,8 @@ exports.get = function (req) {
       body: `<widget class="error">${libs.iimage.translate('iimage.widget.context_panel.fragments.app_installed_in_multiples_sites')}</widget>`
     }
   }
+
+  const content = libs.content.get({ key: req.params.contentId })
 
   const iimageAppConfig = libs.iimage.getSiteConfig(contentId || sitesWithIImageAppInstalled[0]._id)
 
