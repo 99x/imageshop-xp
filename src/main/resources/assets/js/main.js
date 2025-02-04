@@ -4,27 +4,26 @@ function main() {
   const syncImageShopInfoButton = document.getElementById('imageshop-sync-info-button')
 
   function setMessageEventListener (event) {
+    if (event.origin.indexOf('client.imageshop.no') === -1) return
+
     const eventData = event.data.split(';')
-    const selectedPropertyRadioElement = document.querySelector(`input[name="inputName"]:checked`) || {}
+    const selectedPropertyRadioElement = document.querySelector(`input[name="inputName"]:checked`)
 
     changeUploadButtonState('loading')
 
     storeImageInEnonic({
       imageData: JSON.parse(eventData[0]),
-      propertyName: selectedPropertyRadioElement.value,
-      propertyPath: selectedPropertyRadioElement.getAttribute('data-property-path')
+      propertyName: selectedPropertyRadioElement ? selectedPropertyRadioElement.value : undefined,
+      propertyPath: selectedPropertyRadioElement ? selectedPropertyRadioElement.getAttribute('data-property-path') : undefined
     })
+
+    window.removeEventListener('message', setMessageEventListener)
   }
 
   const imageshop = {
     openWindow: function () {
-      if (window.addEventListener) {
-        window.addEventListener('message', setMessageEventListener, { once: true });
-      } else if (window.attachEvent) {
-        window.attachEvent('onmessage', setMessageEventListener);
-      } else {
-        window['message'] = setMessageEventListener
-      }
+      window.removeEventListener("message", setMessageEventListener);
+      window.addEventListener("message", setMessageEventListener);
 
       window.open(imageShopURL, 'imageshop', "width=950, height=650, scrollbars=1, inline=1");
     }
