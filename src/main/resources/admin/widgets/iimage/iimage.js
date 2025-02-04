@@ -28,6 +28,13 @@ exports.get = function (req) {
 
   const iimageAppConfig = libs.iimage.getSiteConfig(contentId || sitesWithIImageAppInstalled[0]._id)
 
+  if (!iimageAppConfig) {
+    return {
+      contentType: 'text/html',
+      body: `<widget class="error">${libs.iimage.translate('iimage.widget.context_panel.fragments.app_not_installed_in_site_fetched')}</widget>`
+    }
+  }
+
   if (['iimage_host'].some(key => Object.keys(iimageAppConfig).indexOf(key) === -1)) {
     return {
       contentType: 'text/html',
