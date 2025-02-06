@@ -23,8 +23,6 @@ module.exports = {
   translate
 }
 
-let connection = null
-
 function getSitesWithIImageAppInstalled() {
   const sites = libs.content.query({
     query: `data.siteConfig.applicationKey = '${app.name}'`,
@@ -73,36 +71,39 @@ function getInputsAllowedToUploadImage(contentId) {
   let partsWithImageSelector = []
 
   if (connection) {
-    const n = connection.draft.get(contentId)
-    const parts = n.components ? libs.objects.forceArray(n.components).filter(c => c.type === 'part') : []
+    const contentNode = connection.draft.get(contentId)
 
-    const processedParts = {}
-
-    parts.forEach(p => {
-      const descriptor = p.part.descriptor
-
-      const part = libs.schema.getComponent({ key: descriptor, type: 'PART' })
-      
-      const form = explodeFieldSets(part.form)
-
-      const filteredInputs = form.filter(item => item.formItemType === 'Input' && item.inputType === 'ImageSelector')
-      
-      if (processedParts[part.displayName]) processedParts[part.displayName]++
-      else processedParts[part.displayName] = 1
-
-      filteredInputs.forEach(item => {
-        let label = `${item.label} (${part.displayName} PART)`
-
-        if (processedParts[part.displayName] > 1) label += ` (${processedParts[part.displayName]})`
-
-        partsWithImageSelector.push({
-          name: item.name,
-          label,
-          path: p.path,
-          type: 'PART'
+    if (contentNode) {
+      const parts = contentNode.components ? libs.objects.forceArray(contentNode.components).filter(c => c.type === 'part') : []
+  
+      const processedParts = {}
+  
+      parts.forEach(p => {
+        const descriptor = p.part.descriptor
+  
+        const part = libs.schema.getComponent({ key: descriptor, type: 'PART' })
+        
+        const form = explodeFieldSets(part.form)
+  
+        const filteredInputs = form.filter(item => item.formItemType === 'Input' && item.inputType === 'ImageSelector')
+        
+        if (processedParts[part.displayName]) processedParts[part.displayName]++
+        else processedParts[part.displayName] = 1
+  
+        filteredInputs.forEach(item => {
+          let label = `${item.label} (${part.displayName} PART)`
+  
+          if (processedParts[part.displayName] > 1) label += ` (${processedParts[part.displayName]})`
+  
+          partsWithImageSelector.push({
+            name: item.name,
+            label,
+            path: p.path,
+            type: 'PART'
+          })
         })
       })
-    })
+    }
   }
 
   //Make fieldsets flat
@@ -214,7 +215,7 @@ function requestImageInfoAndModifyContent (params) {
 
     const data = JSON.parse(response.body)
 
-    getConnection()
+    const connection = getConnection()
 
     const draftContentVersion = connection.draft.getActiveVersion({ key: imageId })
     const masterContentVersion = connection.master.getActiveVersion({ key: imageId })
@@ -269,12 +270,8 @@ function translate (key, values = []) {
 function getConnection () {
   const context = libs.context.get()
 
-  if (connection) return connection
-
-  connection = {
+  return {
     draft: libs.node.connect({ repoId: context.repository, branch: 'draft' }),
     master: libs.node.connect({ repoId: context.repository, branch: 'master' })
   }
-
-  return connection
 }
