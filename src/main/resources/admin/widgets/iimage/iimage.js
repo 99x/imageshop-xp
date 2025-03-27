@@ -10,6 +10,13 @@ exports.get = function (req) {
   const contentId = req.params.contentId
   const sitesWithIImageAppInstalled = libs.iimage.getSitesWithIImageAppInstalled()
 
+  if (!contentId) {
+    return {
+      contentType: 'text/html',
+      body: `<widget class="error">${libs.iimage.translate('iimage.widget.context_panel.fragments.no_content_selected')}</widget>`
+    }
+  }
+
   if (!sitesWithIImageAppInstalled.length) {
     return {
       contentType: 'text/html',
@@ -17,7 +24,7 @@ exports.get = function (req) {
     }
   }
 
-  if (!contentId && sitesWithIImageAppInstalled.length > 1) {
+  if (sitesWithIImageAppInstalled.length > 1) {
     return {
       contentType: 'text/html',
       body: `<widget class="error">${libs.iimage.translate('iimage.widget.context_panel.fragments.app_installed_in_multiples_sites')}</widget>`
