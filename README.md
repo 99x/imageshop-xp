@@ -52,6 +52,8 @@ cd imageshop-xp
 
    - `imageshopToken`: Specify the ImageShop token.
    - `imageshopPrivateKey`: Specify the ImageShop private key.
+   - `imageshopUploadToken`: Specify the ImageShop token for upload feature.
+   - `imageshopUploadPrivateKey`: Specify the ImageShop private key for upload feature.
 
    This approach offers a centralized and secure way to manage these credentials.
 

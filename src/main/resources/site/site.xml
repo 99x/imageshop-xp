@@ -19,27 +19,47 @@
           <occurrences minimum="1" maximum="1" />
         </input>
 
-        <input name="iimage_token" type="TextLine">
-          <label i18n="iimage.site.iimage_token">Token</label>
-          <occurrences minimum="1" maximum="1" />
-        </input>
-
-        <input name="iimage_private_key" type="TextLine">
-          <label i18n="iimage.site.iimage_private_key">Private Key</label>
-          <occurrences minimum="1" maximum="1" />
-        </input>
-
         <input name="iimage_interface_name" type="TextLine">
           <label i18n="iimage.site.iimage_interface_name">Interface Name</label>
           <help-text i18n="iimage.site.iimage_interface_name.help-text">Standard interface used when searching images.</help-text>
           <occurrences minimum="0" maximum="1" />
         </input>
 
-        <input name="iimage_document_prefix" type="TextLine">
-          <label i18n="iimage.site.iimage_document_prefix">Document Prefix</label>
-          <help-text i18n="iimage.site.iimage_document_prefix.help-text">Standard document code prefix used when uploading images.</help-text>
-          <occurrences minimum="0" maximum="1" />
-        </input>
+        <field-set>
+          <label i18n="iimage.site.settings.download">Download settings</label>
+          <items>
+            <input name="iimage_token" type="TextLine">
+              <label i18n="iimage.site.iimage_token">Token</label>
+              <occurrences minimum="1" maximum="1" />
+            </input>
+
+            <input name="iimage_private_key" type="TextLine">
+              <label i18n="iimage.site.iimage_private_key">Private Key</label>
+              <occurrences minimum="1" maximum="1" />
+            </input>
+          </items>
+        </field-set>
+
+        <field-set>
+          <label i18n="iimage.site.settings.upload">Upload settings</label>
+          <items>
+            <input name="iimage_upload_token" type="TextLine">
+              <label i18n="iimage.site.iimage_upload_token">Token</label>
+              <occurrences minimum="1" maximum="1" />
+            </input>
+
+            <input name="iimage_upload_private_key" type="TextLine">
+              <label i18n="iimage.site.iimage_upload_private_key">Private Key</label>
+              <occurrences minimum="1" maximum="1" />
+            </input>
+
+            <input name="iimage_document_prefix" type="TextLine">
+              <label i18n="iimage.site.iimage_document_prefix">Document Prefix</label>
+              <help-text i18n="iimage.site.iimage_document_prefix.help-text">Standard document code prefix used when uploading images.</help-text>
+              <occurrences minimum="0" maximum="1" />
+            </input>
+          </items>
+        </field-set>
 
         <input name="iimage_sizes" type="TextLine">
           <label i18n="iimage.site.iimage_sizes">Sizes</label>

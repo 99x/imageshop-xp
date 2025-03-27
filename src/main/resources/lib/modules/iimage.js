@@ -133,17 +133,20 @@ function explodeFieldSets(form){
 
 /**
  * @param {AppConfig} appConfig 
+ * @param {{ isUpload: boolean }} [options]
  * @returns 
  */
-function getTemporaryToken (appConfig) {
-  
+function getTemporaryToken (appConfig, options = { isUpload: false }) {
+  const privateKey = options.isUpload ? app.config.imageshopUploadToken || appConfig.iimage_upload_private_key : app.config.imageshopPrivateKey || appConfig.iimage_private_key
+  const token = options.isUpload ? app.config.imageshopUploadToken || appConfig.iimage_upload_token : app.config.imageshopToken || appConfig.iimage_token
+
   try {
     const temporaryTokenRequest = libs.httpClient.request({
       url: 'https://webservices.imageshop.no/V4.asmx/GetTemporaryToken',
       method: 'GET',
       queryParams: {
-        privateKey: app.config.imageshopPrivateKey || appConfig.iimage_private_key,
-        token: app.config.imageshopToken || appConfig.iimage_token
+        privateKey,
+        token
       }
     })
 
@@ -164,22 +167,24 @@ function getTemporaryToken (appConfig) {
 /**
  * 
  * @param {AppConfig} appConfig 
+ * @param {{ isUpload: boolean }} [options]
  * @returns 
  */
-function getImageShopURL (appConfig) {
-  const temporaryToken = getTemporaryToken(appConfig)
+function getImageShopURL (appConfig, options = { isUpload: false }) {
+  const temporaryToken = getTemporaryToken(appConfig, options)
 
   let imageshopsitepath = `${appConfig.iimage_host}?FORMAT=json&SETDOMAIN=false&SHOWSIZEDIALOGUE=true&SHOWCROPDIALOGUE=true&REMEMBERSEARCH=true`
 
-    if (appConfig.iimage_interface_name) imageshopsitepath += `&IMAGESHOPINTERFACENAME=${encodeURI(appConfig.iimage_interface_name)}`
-    if (appConfig.iimage_sizes) {
-      const imageSizesJoined = libs.objects.forceArray(appConfig.iimage_sizes).join(':')
-      imageshopsitepath += `&IMAGESHOPSIZES=${encodeURI(imageSizesJoined)}`
-    }
-    if (appConfig.iimage_document_prefix) imageshopsitepath += `&IMAGESHOPDOCUMENTPREFIX=${encodeURI(appConfig.iimage_document_prefix)}`
-    if (temporaryToken.token) imageshopsitepath += `&IMAGESHOPTOKEN=${encodeURI(temporaryToken.token)}`
+  if (options.isUpload) imageshopsitepath += `&SHOWONLYUPLOAD=true`
+  if (appConfig.iimage_interface_name) imageshopsitepath += `&IMAGESHOPINTERFACENAME=${encodeURI(appConfig.iimage_interface_name)}`
+  if (appConfig.iimage_sizes) {
+    const imageSizesJoined = libs.objects.forceArray(appConfig.iimage_sizes).join(':')
+    imageshopsitepath += `&IMAGESHOPSIZES=${encodeURI(imageSizesJoined)}`
+  }
+  if (appConfig.iimage_document_prefix) imageshopsitepath += `&IMAGESHOPDOCUMENTPREFIX=${encodeURI(appConfig.iimage_document_prefix)}`
+  if (temporaryToken.token) imageshopsitepath += `&IMAGESHOPTOKEN=${encodeURI(temporaryToken.token)}`
 
-    return imageshopsitepath
+  return imageshopsitepath
 }
 
 /**

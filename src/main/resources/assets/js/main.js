@@ -1,6 +1,8 @@
 function main() {
   const imageShopURL = document.querySelector('[data-image-shop-url]').getAttribute('data-image-shop-url');
+  const imageShopUploadURL = document.querySelector('[data-image-shop-upload-url]').getAttribute('data-image-shop-upload-url');
   const openImageShopButton = document.getElementById('imageshop-button');
+  const openImageShopUploadButton = document.getElementById('imageshop-upload-button');
   const syncImageShopInfoButton = document.getElementById('imageshop-sync-info-button')
 
   function setMessageEventListener (event) {
@@ -26,11 +28,18 @@ function main() {
       window.addEventListener("message", setMessageEventListener);
 
       window.open(imageShopURL, 'imageshop', "width=950, height=650, scrollbars=1, inline=1");
+    },
+    openUploadWindow: function () {
+      window.open(imageShopUploadURL, 'imageshop', "width=950, height=650, scrollbars=1, inline=1");
     }
   };
 
   openImageShopButton.addEventListener('click', function () {
     imageshop.openWindow();
+  });
+
+  openImageShopUploadButton.addEventListener('click', function () {
+    imageshop.openUploadWindow();
   });
 
   if (syncImageShopInfoButton) {
@@ -67,6 +76,8 @@ function syncImageInfo(e) {
  * @param {String?} params.propertyPath object property path if the input selected is a part
  */
 function storeImageInEnonic(params) {
+  const widgetElement = document.querySelector('.iimage-wrapper')
+
   const imageData = params.imageData
   const propertyName = params.propertyName
   const propertyPath = params.propertyPath
@@ -87,7 +98,7 @@ function storeImageInEnonic(params) {
 
         setMessageText(data.message, 'success');
 
-        openImageShopButton.insertAdjacentElement('afterend', createEditLink(data.image.editURL));
+        widgetElement.insertAdjacentElement('beforeend', createEditLink(data.image.editURL));
 
         if (data.image.wasContentUpdated) window.location.reload();
         return

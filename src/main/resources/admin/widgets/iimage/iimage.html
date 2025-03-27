@@ -3,6 +3,7 @@
   th:data-import-image-service-url="${importImageServiceUrl}"
   th:data-sync-image-info-service-url="${syncImageInfoServiceUrl}"
   th:data-image-shop-url="${imageShopURL}"
+  th:data-image-shop-upload-url="${imageShopUploadURL}"
   th:data-strings="${stringsJson}"
 >
   <link rel="stylesheet" th:href="${portal.assetUrl({'_path=/css/styles.css'})}" />
@@ -24,7 +25,8 @@
   <div id="imageshop-message" class="imageshop-message-wrapper">
     <p>Successfull/Error message</p>
   </div>
-  <button type="button" id="imageshop-button" th:text="${strings.openImageShop}">Open ImageShop</button>
+  <button type="button" id="imageshop-button" th:text="${strings.openImageShop}">Insert from ImageShop</button>
+  <button type="button" id="imageshop-upload-button" th:text="${strings.uploadImage}">Upload new</button>
   <button th:if="${showSyncButton}" type="button" id="imageshop-sync-info-button" th:text="${strings.syncInfo}">Sync Info</button>
 
   <script th:src="${portal.assetUrl({'_path=/js/main.js'})}"></script>

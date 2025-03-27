@@ -53,6 +53,7 @@ exports.get = function (req) {
     generalError: libs.iimage.translate('iimage.fragments.general_error'),
     editImage: libs.iimage.translate('iimage.fragments.edit_image'),
     openImageShop: libs.iimage.translate('iimage.fragments.open_image_shop'),
+    uploadImage: libs.iimage.translate('iimage.fragments.upload_image'),
     importingImage: libs.iimage.translate('iimage.fragments.importing_image'),
     syncInfo: libs.iimage.translate('iimage.fragments.sync_image_info')
   }
@@ -75,6 +76,7 @@ exports.get = function (req) {
       }
     }) : undefined,
     imageShopURL: libs.iimage.getImageShopURL(iimageAppConfig),
+    imageShopUploadURL: libs.iimage.getImageShopURL(iimageAppConfig, { isUpload: true }),
     strings,
     stringsJson: JSON.stringify(strings),
     inputsAllowedToUploadImage: libs.iimage.getInputsAllowedToUploadImage(contentId),
