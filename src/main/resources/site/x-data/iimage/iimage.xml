@@ -1,5 +1,5 @@
 <x-data>
-  <display-name>ImageShop</display-name>
+  <display-name>Imageshop</display-name>
   <form>
     <input name="callback_url" type="TextLine">
       <label i18n="iimage.x-data.callback_url">Callback URL</label>
@@ -7,7 +7,7 @@
     </input>
 
     <input name="document_id" type="TextLine">
-      <label i18n="iimage.x-data.document_id">ImageShop ID</label>
+      <label i18n="iimage.x-data.document_id">Imageshop ID</label>
       <occurrences minimum="0" maximum="1" />
     </input>
   </form>
