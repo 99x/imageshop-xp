@@ -12,7 +12,7 @@
     </input>
 
     <field-set>
-      <label i18n="iimage.site.settings">ImageShop Settings</label>
+      <label i18n="iimage.site.settings">Imageshop Settings</label>
       <items>
         <input name="iimage_host" type="TextLine">
           <label i18n="iimage.site.iimage_host">Host</label>

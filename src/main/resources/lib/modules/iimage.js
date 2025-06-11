@@ -157,7 +157,7 @@ function getTemporaryToken (appConfig) {
     }
 
   } catch (error) {
-    log.error(`ImageShop Integration: Error while requesting a temporary token: ${error}`)
+    log.error(`Imageshop Integration: Error while requesting a temporary token: ${error}`)
   }
 }
 
@@ -255,7 +255,7 @@ function requestImageInfoAndModifyContent (params) {
     }
     log.info(`Image [${imageId}] not published due to different versions in draft and master`)
   } catch (error) {
-    log.error(`ImageShop: Error while requesting the image info: ${error}`)
+    log.error(`Imageshop: Error while requesting the image info: ${error}`)
   }
 }
 

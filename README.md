@@ -1,11 +1,11 @@
-# ImageShop
+# Imageshop
 
-This repository contains an application designed to facilitate the integration of Enonic XP-based sites with the ImageShop platform. The application includes features for efficiently importing, editing, and synchronizing images between the site and the ImageShop media library.
+This repository contains an application designed to facilitate the integration of Enonic XP-based sites with the Imageshop platform. The application includes features for efficiently importing, editing, and synchronizing images between the site and the Imageshop media library.
 
 ## Key Features
 
-- **Installation check**: Automatically detects if the ImageShop app is installed on configured sites.
-- **Image import**: Enables importing images directly from ImageShop into the site environment.
+- **Installation check**: Automatically detects if the Imageshop app is installed on configured sites.
+- **Image import**: Enables importing images directly from Imageshop into the site environment.
 - **Information synchronization**: Displays a synchronization button to update information for already imported images.
 - **Informative error messages**: Provides visual feedback in case of installation issues, misconfiguration, or detection of multiple installations.
 - **Thymeleaf template integration**: Renders the user interface using Thymeleaf templates for consistent presentation.
@@ -13,13 +13,13 @@ This repository contains an application designed to facilitate the integration o
 ## How It Works
 
 The application handles HTTP requests and performs the following checks and actions:
-1. Checks whether ImageShop is installed on the current site.
+1. Checks whether Imageshop is installed on the current site.
 2. Retrieves content based on the `contentId` provided in the request.
 3. Validates the app configuration and returns appropriate error messages if any issues are found.
 4. Constructs a model with service URLs, translation strings, and control variables for the user interface.
 5. Renders the interface using the `iimage.html` template, which includes import and sync buttons.
 
-This application is ideal for development teams looking to integrate ImageShop seamlessly and effectively into their Enonic XP-based projects.
+This application is ideal for development teams looking to integrate Imageshop seamlessly and effectively into their Enonic XP-based projects.
 
 ## Setup
 ### Building
@@ -32,7 +32,7 @@ cd imageshop-xp
 
 ### Installation
 
-1. **Install the application**: Deploy the `ImageShop` in your Enonic XP environment via Enonic market in the applications tool or build it yourself.
+1. **Install the application**: Deploy the `Imageshop` in your Enonic XP environment via Enonic market in the applications tool or build it yourself.
 2. **Configure the application on your site**:
    - Ensure that the application is set up in your site structure.
    - In the site configuration, you will need to fill in the following inputs:
@@ -46,12 +46,12 @@ cd imageshop-xp
      - **Sizes** (optional, format example: `Normal 320x240;320x240`)
      - **Language** (optional, default language for image searches)
 
-   These inputs ensure the proper configuration and functionality of the ImageShop integration in your site.
+   These inputs ensure the proper configuration and functionality of the Imageshop integration in your site.
 3. **Alternative Token and Private Key Configuration**:  
-   The **Token** and **Private Key** required for HTTP requests to the ImageShop endpoint can also be provided through the configuration file `io.99x.imageshop.cfg`. Use the following variables in the file:
+   The **Token** and **Private Key** required for HTTP requests to the Imageshop endpoint can also be provided through the configuration file `io.99x.imageshop.cfg`. Use the following variables in the file:
 
-   - `imageshopToken`: Specify the ImageShop token.
-   - `imageshopPrivateKey`: Specify the ImageShop private key.
+   - `imageshopToken`: Specify the Imageshop token.
+   - `imageshopPrivateKey`: Specify the Imageshop private key.
 
    This approach offers a centralized and secure way to manage these credentials.
 
