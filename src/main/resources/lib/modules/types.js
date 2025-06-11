@@ -2,15 +2,15 @@
  * @typedef {Object} AppConfig
  * 
  * @property {string} iimage_imported_resources_folder - Enonic object ID where the images should be imported
- * @property {string} iimage_host - ImageShop Integration host
+ * @property {string} iimage_host - Imageshop Integration host
  * @property {string} iimage_token 
  * @property {string} iimage_private_key
  * @property {?string} iimage_interface_name
  * @property {?string} iimage_document_prefix
  * @property {?string[]} iimage_sizes
  * @property {?string} iimage_language
- * @property {?string} iimage_language_alt_label - ImageShop name for the alternative text property. Each language has its own name
- * @property {?string} iimage_language_caption - ImageShop name for the caption property. Each language has its own name
+ * @property {?string} iimage_language_alt_label - Imageshop name for the alternative text property. Each language has its own name
+ * @property {?string} iimage_language_caption - Imageshop name for the caption property. Each language has its own name
  */
 
 /**

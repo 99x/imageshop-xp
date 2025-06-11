@@ -1,5 +1,5 @@
 <widget>
-  <display-name i18n="iimage.widget.context_panel.display_name">ImageShop</display-name>
+  <display-name i18n="iimage.widget.context_panel.display_name">Imageshop</display-name>
   <description i18n="iimage.widget.context_panel.description">Search for images, edit and store them in Enonic</description>
   <interfaces>
     <interface>contentstudio.contextpanel</interface>
