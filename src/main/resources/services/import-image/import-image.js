@@ -82,6 +82,7 @@ exports.post = function (request) {
         if (currentContent && propertyName && !propertyPath) {
           const updatedContent = libs.content.modify({
             key: params.contentId,
+            requireValid: false,
             editor: function (c) {
               c.data[propertyName] = image._id
 
