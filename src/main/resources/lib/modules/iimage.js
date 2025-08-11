@@ -174,9 +174,11 @@ function getImageShopURL (appConfig, options = { isUpload: false }) {
   const temporaryToken = getTemporaryToken(appConfig, options)
 
   let imageshopsitepath = `${appConfig.iimage_host}?FORMAT=json&SETDOMAIN=false&SHOWSIZEDIALOGUE=true&SHOWCROPDIALOGUE=true&REMEMBERSEARCH=true`
-
+  
   if (options.isUpload) imageshopsitepath += `&SHOWONLYUPLOAD=true`
-  if (appConfig.iimage_interface_name) imageshopsitepath += `&IMAGESHOPINTERFACENAME=${encodeURI(appConfig.iimage_interface_name)}`
+  if (options.isUpload && appConfig.iimage_upload_interface_id) imageshopsitepath += `&DEFAULTINTERFACES=${appConfig.iimage_upload_interface_id}`
+
+  if (appConfig.iimage_interface_name && !options.isUpload) imageshopsitepath += `&IMAGESHOPINTERFACENAME=${encodeURI(appConfig.iimage_interface_name)}`
   if (appConfig.iimage_sizes) {
     const imageSizesJoined = libs.objects.forceArray(appConfig.iimage_sizes).join(':')
     imageshopsitepath += `&IMAGESHOPSIZES=${encodeURI(imageSizesJoined)}`

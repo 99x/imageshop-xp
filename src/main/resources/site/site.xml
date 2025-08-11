@@ -25,6 +25,12 @@
           <occurrences minimum="0" maximum="1" />
         </input>
 
+        <input name="iimage_upload_interface_id" type="TextLine">
+          <label i18n="iimage.site.iimage_upload_interface_id">Upload Interface ID</label>
+          <help-text i18n="iimage.site.iimage_upload_interface_id.help-text">Interface ID used when uploading images.</help-text>
+          <occurrences minimum="0" maximum="1" />
+        </input>
+
         <field-set>
           <label i18n="iimage.site.settings.download">Download settings</label>
           <items>
