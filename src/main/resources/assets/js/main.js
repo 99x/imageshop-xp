@@ -1,5 +1,6 @@
 function main() {
-  const imageShopURL = document.querySelector('[data-image-shop-url]').getAttribute('data-image-shop-url');
+  const config = getWidgetConfig()
+  const imageShopURL = config.imageShopURL
   const openImageShopButton = document.getElementById('imageshop-button');
   const syncImageShopInfoButton = document.getElementById('imageshop-sync-info-button')
 
@@ -47,7 +48,9 @@ function syncImageInfo(e) {
   target.setAttribute('disabled', true)
   target.style.cursor = 'wait';
 
-  const syncImageInfoServiceURL = document.querySelector('[data-sync-image-info-service-url]').getAttribute('data-sync-image-info-service-url')
+  const config = getWidgetConfig()
+
+  const syncImageInfoServiceURL = config.syncImageInfoServiceUrl
 
   fetch(syncImageInfoServiceURL)
     .then(response => response.json())
@@ -71,9 +74,10 @@ function storeImageInEnonic(params) {
   const propertyName = params.propertyName
   const propertyPath = params.propertyPath
 
-  const importImageServiceUrl = document.querySelector('[data-import-image-service-url]').getAttribute('data-import-image-service-url');
+  const config = getWidgetConfig()
+
+  const importImageServiceUrl = config.importImageServiceUrl
   const openImageShopButton = document.getElementById('imageshop-button');
-  const strings = JSON.parse(document.querySelector('[data-strings]').getAttribute('data-strings'));
   
   fetch(importImageServiceUrl, {
     method: 'POST',
@@ -99,7 +103,7 @@ function storeImageInEnonic(params) {
     .catch(error => {
       console.error('Error:', error);
       if (document.querySelector('.edit-image-link')) document.querySelector('.edit-image-link').remove();
-      setMessageText(strings.generalError, 'error');
+      setMessageText(config.generalError, 'error');
     })
     .finally(() => {
       setTimeout(() => {
@@ -115,13 +119,13 @@ function storeImageInEnonic(params) {
  * @returns 
  */
 function createEditLink(editURL) {
-  const strings = JSON.parse(document.querySelector('[data-strings]').getAttribute('data-strings'));
+  const config = getWidgetConfig()
 
   const editLink = document.createElement('a');
   editLink.className = 'edit-image-link';
   editLink.href = editURL;
   editLink.target = '_blank';
-  editLink.innerHTML = strings.editImage;
+  editLink.innerHTML = config.editImage;
   return editLink
 }
 
@@ -131,19 +135,19 @@ function createEditLink(editURL) {
  * @returns 
  */
 function changeUploadButtonState(state) {
-  const strings = JSON.parse(document.querySelector('[data-strings]').getAttribute('data-strings'));
+  const config = getWidgetConfig()
   const openImageShopButton = document.getElementById('imageshop-button');
 
   if (state === 'loading') {
     openImageShopButton.setAttribute('disabled', true);
-    openImageShopButton.innerHTML = strings.importingImage;
+    openImageShopButton.innerHTML = config.importingImage;
     openImageShopButton.style.cursor = 'wait';
     return
   }
 
   if (state === 'default') {
     openImageShopButton.removeAttribute('disabled');
-    openImageShopButton.innerHTML = strings.openImageShop;
+    openImageShopButton.innerHTML = config.openImageShop;
     openImageShopButton.style.cursor = 'pointer';
     return
   }
@@ -160,6 +164,12 @@ function setMessageText(message, status) {
 
   messageTextElement.innerHTML = message;
   messageElement.setAttribute('data-status', status);
+}
+
+function getWidgetConfig() {
+  const config = JSON.parse(document.getElementById("widget-config-id").innerText);
+  
+  return config;
 }
 
 main()
