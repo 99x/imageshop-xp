@@ -58,23 +58,29 @@ exports.get = function (req) {
   }
 
   const showSyncButton = content && content.type === 'media:image' && !!libs.objects.trySafe(() => content.x['io-99x-imageshop'].iimage.document_id)
+  const importImageServiceUrl = libs.portal.serviceUrl({
+    service: 'import-image',
+    type: 'absolute',
+    params: {
+      contentId: contentId || sitesWithIImageAppInstalled[0]._id
+    }
+  })
+
+  const syncImageInfoServiceUrl = showSyncButton ? libs.portal.serviceUrl({
+    service: 'sync-image-info',
+    type: 'absolute',
+    params: {
+      contentId
+    }
+  }) : undefined
+
+  const imageShopURL = libs.iimage.getImageShopURL(iimageAppConfig)
+
+  strings.importImageServiceUrl = importImageServiceUrl
+  strings.syncImageInfoServiceUrl = syncImageInfoServiceUrl
+  strings.imageShopURL = imageShopURL
 
   const model = {
-    importImageServiceUrl: libs.portal.serviceUrl({
-      service: 'import-image',
-      type: 'absolute',
-      params: {
-        contentId: contentId || sitesWithIImageAppInstalled[0]._id
-      }
-    }),
-    syncImageInfoServiceUrl: showSyncButton ? libs.portal.serviceUrl({
-      service: 'sync-image-info',
-      type: 'absolute',
-      params: {
-        contentId
-      }
-    }) : undefined,
-    imageShopURL: libs.iimage.getImageShopURL(iimageAppConfig),
     strings,
     stringsJson: JSON.stringify(strings),
     inputsAllowedToUploadImage: libs.iimage.getInputsAllowedToUploadImage(contentId),
