@@ -41,6 +41,12 @@
           <occurrences minimum="0" maximum="1" />
         </input>
 
+        <input name="iimage_download_full_size" type="CheckBox">
+          <label i18n="iimage.site.iimage_download_full_size">Download full size</label>
+          <help-text i18n="iimage.site.iimage_download_full_size.help-text">If checked, images will be downloaded at full size immediately when selected. If unchecked, size selection dialogs will be shown.</help-text>
+          <occurrences minimum="0" maximum="1" />
+        </input>
+
         <input name="iimage_sizes" type="TextLine">
           <label i18n="iimage.site.iimage_sizes">Sizes</label>
           <help-text i18n="iimage.site.iimage_sizes.help-text">Format: name;size. Example: Stor 640x480;640x480</help-text>

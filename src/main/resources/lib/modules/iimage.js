@@ -169,17 +169,25 @@ function getTemporaryToken (appConfig) {
 function getImageShopURL (appConfig) {
   const temporaryToken = getTemporaryToken(appConfig)
 
-  let imageshopsitepath = `${appConfig.iimage_host}?FORMAT=json&SETDOMAIN=false&SHOWSIZEDIALOGUE=true&SHOWCROPDIALOGUE=true&REMEMBERSEARCH=true`
+  const downloadFullSize = libs.objects.trySafe(() => appConfig.iimage_download_full_size)
 
-    if (appConfig.iimage_interface_name) imageshopsitepath += `&IMAGESHOPINTERFACENAME=${encodeURI(appConfig.iimage_interface_name)}`
+  let imageshopsitepath = `${appConfig.iimage_host}?FORMAT=json&SETDOMAIN=false`
+
+  if (downloadFullSize) {
+    imageshopsitepath += `&INSERTIMMEDIATELY=true`
+  } else {
+    imageshopsitepath += `&SHOWSIZEDIALOGUE=false&SHOWCROPDIALOGUE=false&REMEMBERSEARCH=true`
     if (appConfig.iimage_sizes) {
       const imageSizesJoined = libs.objects.forceArray(appConfig.iimage_sizes).join(':')
       imageshopsitepath += `&IMAGESHOPSIZES=${encodeURI(imageSizesJoined)}`
     }
-    if (appConfig.iimage_document_prefix) imageshopsitepath += `&IMAGESHOPDOCUMENTPREFIX=${encodeURI(appConfig.iimage_document_prefix)}`
-    if (temporaryToken.token) imageshopsitepath += `&IMAGESHOPTOKEN=${encodeURI(temporaryToken.token)}`
+  }
 
-    return imageshopsitepath
+  if (appConfig.iimage_interface_name) imageshopsitepath += `&IMAGESHOPINTERFACENAME=${encodeURI(appConfig.iimage_interface_name)}`
+  if (appConfig.iimage_document_prefix) imageshopsitepath += `&IMAGESHOPDOCUMENTPREFIX=${encodeURI(appConfig.iimage_document_prefix)}`
+  if (temporaryToken.token) imageshopsitepath += `&IMAGESHOPTOKEN=${encodeURI(temporaryToken.token)}`
+
+  return imageshopsitepath
 }
 
 /**

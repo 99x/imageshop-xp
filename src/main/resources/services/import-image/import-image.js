@@ -6,6 +6,7 @@ const libs = {
   httpClient: require('/lib/http-client'),
   iimage: require('/lib/modules/iimage'),
   objects: require('/lib/utils/objects'),
+  imageConverter: require('/lib/utils/image-converter')
 }
 
 exports.post = function (request) {
@@ -16,6 +17,8 @@ exports.post = function (request) {
     const imageData = data.imageData || {}
     const propertyName = data.propertyName
     const propertyPath = data.propertyPath
+
+    log.info(JSON.stringify(imageData, null, 2))
 
     if (!params.contentId) {
       return {
@@ -28,6 +31,7 @@ exports.post = function (request) {
     }
 
     const iimageAppConfig = libs.iimage.getSiteConfig(params.contentId)
+    const token = iimageAppConfig.iimage_token
     const currentSiteLanguage = iimageAppConfig.iimage_language || libs.objects.trySafe(() => libs.iimage.getSite(params.contentId).language)
     const importedImageFolder = iimageAppConfig.iimage_imported_resources_folder ? libs.content.get({ key: iimageAppConfig.iimage_imported_resources_folder }) : null
 
@@ -41,8 +45,25 @@ exports.post = function (request) {
       }
     }
 
+    let downloadImageURL = imageData.image.file
+
+    const fullSizeImageRequest = libs.httpClient.request({
+      url: `https://api.imageshop.no/Download`,
+      method: 'POST',
+      headers: { 'Cache-Control': 'no-cache', token },
+      body: JSON.stringify({
+        DocumentId: imageData.documentId,
+        Quality: 'FullSize'
+      })
+    })
+
+    if (fullSizeImageRequest.status === 200) {
+      const fullSizeImageResponseBody = JSON.parse(fullSizeImageRequest.body)
+      downloadImageURL = fullSizeImageResponseBody.Url
+    }
+
     const response = libs.httpClient.request({
-      url: imageData.image.file,
+      url: downloadImageURL,
       method: 'GET',
       headers: { 'Cache-Control': 'no-cache' },
     })
@@ -50,13 +71,39 @@ exports.post = function (request) {
     if (response.status === 200) {
       const extractedImageInfo = extractImageInfo({ siteLanguage: currentSiteLanguage, imageData, appConfig: iimageAppConfig })
 
+      // Check if WebP conversion is enabled and download full size is NOT checked
+      const downloadFullSize = libs.objects.trySafe(() => iimageAppConfig.iimage_download_full_size)
+      
+      let imageStream = response.bodyStream
+      let mimeType = response.contentType
+      let imageName = extractedImageInfo.sanitizedTitle
+
+      // Convert to WebP if enabled and download full size is NOT checked
+      if (downloadFullSize) {
+        try {
+          imageStream = libs.imageConverter.convertToWebP({
+            imageStream: response.bodyStream,
+            quality: 85
+          })
+          mimeType = 'image/webp'
+          // Update file extension to .webp
+          imageName = imageName.replace(/\.(png|jpg|jpeg)$/i, '.webp')
+          if (!/\.webp$/i.test(imageName)) {
+            imageName += '.webp'
+          }
+        } catch (conversionError) {
+          log.error(`Failed to convert image to WebP, using original format: ${conversionError}`)
+          // Continue with original format if conversion fails
+        }
+      }
+
       let image = libs.content.createMedia({
-        name: extractedImageInfo.sanitizedTitle,
+        name: imageName,
         parentPath: importedImageFolder._path,
-        mimeType: response.contentType,
+        mimeType: mimeType,
         // focalX: libs.objects.trySafe(() => Math.abs(imageData.focalPoint.x * -4.3028846153846)),
         // focalY: libs.objects.trySafe(() => Math.abs(imageData.focalPoint.y)),
-        data: response.bodyStream
+        data: imageStream
       })
 
       if (image) {
