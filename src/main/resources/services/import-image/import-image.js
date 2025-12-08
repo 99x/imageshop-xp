@@ -2,6 +2,7 @@
 
 const libs = {
   content: require('/lib/xp/content'),
+  context: require('/lib/xp/context'),
   common: require('/lib/xp/common'),
   httpClient: require('/lib/http-client'),
   iimage: require('/lib/modules/iimage'),
@@ -18,8 +19,6 @@ exports.post = function (request) {
     const propertyName = data.propertyName
     const propertyPath = data.propertyPath
 
-    log.info(JSON.stringify(imageData, null, 2))
-
     if (!params.contentId) {
       return {
         status: 400,
@@ -31,9 +30,99 @@ exports.post = function (request) {
     }
 
     const iimageAppConfig = libs.iimage.getSiteConfig(params.contentId)
-    const token = iimageAppConfig.iimage_token
-    const currentSiteLanguage = iimageAppConfig.iimage_language || libs.objects.trySafe(() => libs.iimage.getSite(params.contentId).language)
-    const importedImageFolder = iimageAppConfig.iimage_imported_resources_folder ? libs.content.get({ key: iimageAppConfig.iimage_imported_resources_folder }) : null
+    const storeInRootSite = libs.objects.trySafe(() => iimageAppConfig.iimage_store_in_root_site === true || iimageAppConfig.iimage_store_in_root_site === 'true')
+    
+    // Determine which site to use (root or current)
+    let targetSite = libs.iimage.getSite(params.contentId)
+    let targetSiteConfig = iimageAppConfig
+    let targetSiteLanguage = iimageAppConfig.iimage_language || libs.objects.trySafe(() => targetSite.language)
+    let rootRepository = null
+    
+    if (storeInRootSite) {
+      const rootSiteResult = libs.iimage.getRootSite(params.contentId)
+      if (!rootSiteResult || !rootSiteResult.site || !rootSiteResult.repository) {
+        return {
+          status: 400,
+          body: {
+            message: libs.iimage.translate('iimage.service.import-image.root_site_not_found')
+          },
+          contentType: 'application/json'
+        }
+      }
+      
+      const rootSite = rootSiteResult.site
+      rootRepository = rootSiteResult.repository
+      
+      // Get root site config
+      targetSite = rootSite
+      
+      targetSiteConfig = libs.context.run({
+        repository: rootRepository,
+        branch: 'draft'
+      }, () => {
+        return libs.iimage.getSiteConfig(rootSite._id)
+      })
+      
+      // If root site doesn't have app configured, we'll create a default folder
+      targetSiteLanguage = targetSiteConfig ? (targetSiteConfig.iimage_language || libs.objects.trySafe(() => rootSite.language)) : libs.objects.trySafe(() => rootSite.language)
+    }
+    
+    // Use token from target site config, or fall back to current site config if root site doesn't have app
+    const token = targetSiteConfig ? targetSiteConfig.iimage_token : iimageAppConfig.iimage_token
+    
+    // Get imported image folder in the correct repository context
+    let importedImageFolder
+    if (storeInRootSite && rootRepository) {
+      importedImageFolder = libs.context.run({
+        repository: rootRepository,
+        branch: 'draft'
+      }, () => {
+        // If folder is configured, use it
+        if (targetSiteConfig && targetSiteConfig.iimage_imported_resources_folder) {
+          const folder = libs.content.get({ key: targetSiteConfig.iimage_imported_resources_folder })
+          if (folder) return folder
+        }
+        
+        // Otherwise, create or get default folder
+        const defaultFolderDisplayName = 'Imageshop Import'
+        const defaultFolderName = libs.common.sanitize(defaultFolderDisplayName)
+        // Use root site's path as parent (sites are typically at /content/<site-name>)
+        const sitePath = targetSite._path || '/content'
+        
+        // Try to find existing folder first
+        try {
+          const folderQuery = libs.content.query({
+            query: `_path = "${sitePath}/${defaultFolderName}" AND type = "base:folder"`,
+            contentTypes: ['base:folder'],
+            count: 1
+          })
+          
+          if (folderQuery.hits && folderQuery.hits.length > 0) {
+            return folderQuery.hits[0]
+          }
+        } catch (e) {
+          // Query failed, will try to create folder
+        }
+        
+        // Create default folder under the root site
+        try {
+          const newFolder = libs.content.create({
+            name: defaultFolderName,
+            parentPath: sitePath,
+            displayName: defaultFolderDisplayName,
+            contentType: 'base:folder',
+            data: {}
+          })
+          log.info(`Created default images folder at ${newFolder._path} in root site`)
+          return newFolder
+        } catch (createError) {
+          log.error(`Failed to create default images folder in root site at ${sitePath}: ${createError}`)
+          return null
+        }
+      })
+    } else {
+      importedImageFolder = targetSiteConfig && targetSiteConfig.iimage_imported_resources_folder ? libs.content.get({ key: targetSiteConfig.iimage_imported_resources_folder }) : null
+    }
 
     if (!importedImageFolder) {
       return {
@@ -69,10 +158,10 @@ exports.post = function (request) {
     })
 
     if (response.status === 200) {
-      const extractedImageInfo = extractImageInfo({ siteLanguage: currentSiteLanguage, imageData, appConfig: iimageAppConfig })
+      const extractedImageInfo = extractImageInfo({ siteLanguage: targetSiteLanguage, imageData, appConfig: targetSiteConfig })
 
       // Check if WebP conversion is enabled and download full size is NOT checked
-      const downloadFullSize = libs.objects.trySafe(() => iimageAppConfig.iimage_download_full_size)
+      const downloadFullSize = libs.objects.trySafe(() => targetSiteConfig.iimage_download_full_size)
       
       let imageStream = response.bodyStream
       let mimeType = response.contentType
@@ -97,32 +186,77 @@ exports.post = function (request) {
         }
       }
 
-      let image = libs.content.createMedia({
-        name: imageName,
-        parentPath: importedImageFolder._path,
-        mimeType: mimeType,
-        // focalX: libs.objects.trySafe(() => Math.abs(imageData.focalPoint.x * -4.3028846153846)),
-        // focalY: libs.objects.trySafe(() => Math.abs(imageData.focalPoint.y)),
-        data: imageStream
-      })
+      // Create image in the appropriate repository context
+      let image
+      if (storeInRootSite && rootRepository) {
+        // Switch to root site's repository to create the image
+        image = libs.context.run({
+          repository: rootRepository,
+          branch: 'draft'
+        }, () => {
+          return libs.content.createMedia({
+            name: imageName,
+            parentPath: importedImageFolder._path,
+            mimeType: mimeType,
+            // focalX: libs.objects.trySafe(() => Math.abs(imageData.focalPoint.x * -4.3028846153846)),
+            // focalY: libs.objects.trySafe(() => Math.abs(imageData.focalPoint.y)),
+            data: imageStream
+          })
+        })
+      } else {
+        // Use current repository context
+        image = libs.content.createMedia({
+          name: imageName,
+          parentPath: importedImageFolder._path,
+          mimeType: mimeType,
+          // focalX: libs.objects.trySafe(() => Math.abs(imageData.focalPoint.x * -4.3028846153846)),
+          // focalY: libs.objects.trySafe(() => Math.abs(imageData.focalPoint.y)),
+          data: imageStream
+        })
+      }
 
       if (image) {
-        image = libs.content.modify({
-          key: image._id,
-          editor: function (c) {
-            c.displayName = extractedImageInfo.title
-            c.data.altText = extractedImageInfo.altText
-            c.data.caption = extractedImageInfo.caption
+        // Modify image in the appropriate repository context
+        if (storeInRootSite && rootRepository) {
+          image = libs.context.run({
+            repository: rootRepository,
+            branch: 'draft'
+          }, () => {
+            return libs.content.modify({
+              key: image._id,
+              editor: function (c) {
+                c.displayName = extractedImageInfo.title
+                c.data.altText = extractedImageInfo.altText
+                c.data.caption = extractedImageInfo.caption
 
-            c.x['io-99x-imageshop'] = {
-              iimage: {
-                callback_url: imageData.image.file,
-                document_id: imageData.documentId
+                c.x['io-99x-imageshop'] = {
+                  iimage: {
+                    callback_url: imageData.image.file,
+                    document_id: imageData.documentId
+                  }
+                }
+                return c
               }
+            })
+          })
+        } else {
+          image = libs.content.modify({
+            key: image._id,
+            editor: function (c) {
+              c.displayName = extractedImageInfo.title
+              c.data.altText = extractedImageInfo.altText
+              c.data.caption = extractedImageInfo.caption
+
+              c.x['io-99x-imageshop'] = {
+                iimage: {
+                  callback_url: imageData.image.file,
+                  document_id: imageData.documentId
+                }
+              }
+              return c
             }
-            return c
-          }
-        })
+          })
+        }
 
         const currentContent = libs.content.get({ key: params.contentId })
 

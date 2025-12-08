@@ -17,6 +17,7 @@ module.exports = {
   getImageShopURL,
   getInputsAllowedToUploadImage,
   getSite,
+  getRootSite,
   getSitesWithIImageAppInstalled,
   getSiteConfig,
   requestImageInfoAndModifyContent,
@@ -53,6 +54,101 @@ function getSite (contentId) {
   })
 
   return site
+}
+
+/**
+ * Traverses up the site hierarchy to find the root site
+ * @param {String} contentId - Content ID from any layer
+ * @returns {Object|null} Root site object or null if not found
+ */
+function getRootSite(contentId) {
+  try {
+    let currentSite = getSite(contentId)
+    if (!currentSite) {
+      return null
+    }
+
+    // If no originProject, this is already the root site
+    if (!currentSite.originProject) {
+      return currentSite
+    }
+
+    // Traverse up the hierarchy
+    let site = currentSite
+    let rootRepository = null
+    let visitedProjects = new Set() // Prevent infinite loops
+    
+    while (site && site.originProject) {
+      const parentProject = site.originProject
+      
+      // Prevent infinite loops
+      if (visitedProjects.has(parentProject)) {
+        log.error(`Circular reference detected in site hierarchy: ${parentProject}`)
+        break
+      }
+      visitedProjects.add(parentProject)
+
+      // Switch context to parent project to get the site
+      const parentRepository = `com.enonic.cms.${parentProject}`
+      const result = libs.context.run({
+        repository: parentRepository,
+        branch: 'draft'
+      }, () => {
+        // Query for sites with Imageshop app installed in this context
+        const sites = libs.content.query({
+          query: `data.siteConfig.applicationKey = '${app.name}'`,
+          contentTypes: ['portal:site'],
+          count: 1
+        })
+        
+        if (sites.hits && sites.hits.length > 0) {
+          return { site: sites.hits[0], repository: libs.context.get().repository }
+        }
+        
+        // If no site found with app, try to get site by path structure
+        // Sites are usually at /content/<site-name>
+        // Try to find any site
+        const allSites = libs.content.query({
+          query: '_path LIKE "/content/*"',
+          contentTypes: ['portal:site'],
+          count: 1
+        })
+        
+        const foundSite = allSites.hits && allSites.hits.length > 0 ? allSites.hits[0] : null
+        return foundSite ? { site: foundSite, repository: libs.context.get().repository } : null
+      })
+
+      if (!result || !result.site) {
+        log.error(`Could not find site in parent project: ${parentProject}`)
+        break
+      }
+      
+      site = result.site
+      rootRepository = result.repository
+    }
+
+    // Return root site with repository info (app validation will happen in import-image.js)
+    if (site) {
+      // If we traversed up, use the tracked repository, otherwise use current context
+      let repository
+      if (rootRepository) {
+        repository = rootRepository
+      } else {
+        // This is already the root site, get repository from current context
+        const currentContext = libs.context.get()
+        repository = currentContext.repository
+      }
+      return {
+        site,
+        repository
+      }
+    }
+
+    return null
+  } catch (e) {
+    log.error(`Error getting root site: ${e}`)
+    return null
+  }
 }
 
 /**

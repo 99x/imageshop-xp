@@ -47,6 +47,12 @@
           <occurrences minimum="0" maximum="1" />
         </input>
 
+        <input name="iimage_store_in_root_site" type="CheckBox">
+          <label i18n="iimage.site.iimage_store_in_root_site">Store images in root site</label>
+          <help-text i18n="iimage.site.iimage_store_in_root_site.help-text">If checked, images imported from any layer will be stored in the root site's folder, making them available to all child layers. The root site must have the Imageshop app installed.</help-text>
+          <occurrences minimum="0" maximum="1" />
+        </input>
+
         <input name="iimage_sizes" type="TextLine">
           <label i18n="iimage.site.iimage_sizes">Sizes</label>
           <help-text i18n="iimage.site.iimage_sizes.help-text">Format: name;size. Example: Stor 640x480;640x480</help-text>
