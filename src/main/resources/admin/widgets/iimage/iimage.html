@@ -1,11 +1,7 @@
-<widget
-  class="iimage-wrapper"
-  th:data-import-image-service-url="${importImageServiceUrl}"
-  th:data-sync-image-info-service-url="${syncImageInfoServiceUrl}"
-  th:data-image-shop-url="${imageShopURL}"
-  th:data-image-shop-upload-url="${imageShopUploadURL}"
-  th:data-strings="${stringsJson}"
->
+
+<widget class="iimage-wrapper">
+  <script type="application/json" id="widget-config-id" th:utext="${stringsJson}"></script>
+
   <link rel="stylesheet" th:href="${portal.assetUrl({'_path=/css/styles.css'})}" />
 
   <th:block th:if="${!#lists.isEmpty(inputsAllowedToUploadImage)}">
